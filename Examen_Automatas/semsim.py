@@ -118,5 +118,63 @@ class semsim:
         salida.close() 
 
     def crearVar(self):
-        print('Es var')
-        pass
+        salida = open('output.s', 'w+')
+        salida.write('.data\n')              #DATOS A PARTIR DE AQUI
+        salida.write('\tarray:\t.double ')
+        
+        for item in range(len(self.valoresFinales)-1):
+            salida.write(str(self.valoresFinales[item]) + ', ')
+        salida.write(str(self.valoresFinales[-1])+'\n')
+        salida.write('\tlength:\t.double ' + str(len(self.valoresFinales)) + '\n')
+        salida.write('\tlength1:\t.word ' + str(len(self.valoresFinales)) + '\n')
+        salida.write('\tsum:\t.double 0\n')
+        salida.write('\taverage:\t.double 0\n')
+        salida.write('\tvar:\t.double 0\n')
+        
+        
+        
+        salida.write('.text\n')                 #TEXT A PARTIR DE AQUI
+        salida.write('\tmain:\n')
+        salida.write('\tla $t0, array\n\tli $t1, 0\n\tldc1 $f2, length\n\tlw $t2, length1\n\tldc1 $f4, sum\n') #VARIABLES NECESARIAS
+       
+        salida.write('\tsumLoop:\n'+            #CICLO PARA HACER EL CALCULO
+        '\t\tldc1 $f6, ($t0)\n'+
+        '\t\tadd.d $f4, $f4, $f6\n'+
+        '\t\tadd $t1, $t1, 1\n'+
+        '\t\tadd $t0, $t0, 8\n'+
+        '\t\tblt $t1, $t2, sumLoop\n'+
+        '\tswc1 $f4, sum\n\n')
+
+        salida.write('\t#li $v0, 3\n')  #DESPLEGAR LA SUMA
+        salida.write('\t#mov.d $f12, $f4\n')
+        salida.write('\t#syscall\n\n')  
+
+        salida.write('\tdiv.d $f6, $f4, $f2\n'+
+	    '\tswc1 $f6, average\n'+
+        '\tmov.d $f8, $f6\n\n')
+
+        salida.write('\tli $v0, 3\n')  #DESPLEGAR El PROMEDIO
+        salida.write('\tmov.d $f12, $f8\n')
+        salida.write('\tsyscall\n\n')  
+
+        salida.write('\tla $t0, array\n\tli $t1, 0\n\tldc1 $f2, length\n\tlw $t2, length1\n\tldc1 $f10, var\n') #VARIABLES NECESARIAS
+
+        salida.write('	devLoop:\n'+
+		'\t\tldc1 $f6, ($t0)\n'+
+		'\t\tsub.d $f4, $f6, $f8\n' +
+		'\t\tmul.d $f4, $f4, $f4\n' +
+		'\t\tadd.d $f10, $f10, $f4\n' +
+		'\t\tadd $t1, $t1, 1\n' +
+        '\t\tadd $t0, $t0, 8\n' +
+		'\t\tblt $t1, $t2, devLoop\n')
+
+        salida.write('\tswc1 $f10, sum\n\n'+
+	    '\tdiv.d $f10, $f10, $f2\n'+
+    	'\tswc1 $f10, average\n\n'+
+	    '\tli $v0, 3\n'+
+	    '\tmov.d $f12, $f10\n'+
+	    '\tsyscall\n\n'+
+	    '\tli $v0, 10\n'+
+	    '\tsyscall')
+
+        salida.close() 

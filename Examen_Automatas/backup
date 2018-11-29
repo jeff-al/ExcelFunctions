@@ -1,7 +1,7 @@
 .data
-	array:	.double -1.13, 3, 4, 5, 6, 2.0, 5, 90, 12, 30, 2, -1, 2.2, 2
-	length:	.double 14
-	length1:	.word 14
+	array:	.double 1, 2, 3, 4, 5, 6, 7, 8, 9
+	length:	.double 9
+	length1:	.word 9
 	sum:	.double 0
 	average:	.double 0
 	var:	.double 0
@@ -18,7 +18,7 @@
 		add $t1, $t1, 1
 		add $t0, $t0, 8
 		blt $t1, $t2, sumLoop
-	swc1 $f4, sum
+	sdc1 $f4, sum
 
 	#li $v0, 3
 	#mov.d $f12, $f4
@@ -26,12 +26,13 @@
 
 	div.d $f6, $f4, $f2
 	swc1 $f6, average
-	mov.d $f8, $f6
 
+	mov.d $f8, $f6
+	
 	li $v0, 3
 	mov.d $f12, $f8
 	syscall
-
+	
 	la $t0, array
 	li $t1, 0
 	ldc1 $f2, length
@@ -46,10 +47,10 @@
 		add $t0, $t0, 8
 		blt $t1, $t2, devLoop
 	swc1 $f10, sum
-
+	
 	div.d $f10, $f10, $f2
 	swc1 $f10, average
-
+	
 	li $v0, 3
 	mov.d $f12, $f10
 	syscall
