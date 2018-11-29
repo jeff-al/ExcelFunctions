@@ -79,38 +79,39 @@ class semsim:
         print('Es average')
         salida = open('output.s', 'w+')
         salida.write('.data\n')              #DATOS A PARTIR DE AQUI
-        salida.write('\tarray:\t.word ')
+        salida.write('\tarray:\t.double ')
         
         for item in range(len(self.valoresFinales)-1):
             salida.write(str(self.valoresFinales[item]) + ', ')
         salida.write(str(self.valoresFinales[-1])+'\n')
-        salida.write('\tlength:\t.word ' + str(len(self.valoresFinales)) + '\n')
-        salida.write('\tsum:\t.word 0\n')
-        salida.write('\taverage:\t.word 0\n')
+        salida.write('\tlength:\t.double ' + str(len(self.valoresFinales)) + '\n')
+        salida.write('\tlength1:\t.word ' + str(len(self.valoresFinales)) + '\n')
+        salida.write('\tsum:\t.double 0\n')
+        salida.write('\taverage:\t.double 0\n')
         
         
         
         salida.write('.text\n')                 #TEXT A PARTIR DE AQUI
         salida.write('\tmain:\n')
-        salida.write('\tla $t0, array\n\tli $t1, 0\n\tlw $t2, length\n\tli $t3, 0\n') #VARIABLES NECESARIAS
+        salida.write('\tla $t0, array\n\tli $t1, 0\n\tldc1 $f2, length\n\tlw $t2, length1\n\tldc1 $f4, sum\n') #VARIABLES NECESARIAS
        
         salida.write('\tsumLoop:\n')            #CICLO PARA HACER EL CALCULO
-        salida.write('\t\tlw $t4, ($t0)\n')
-        salida.write('\t\tadd $t3, $t3, $t4\n')
+        salida.write('\t\tldc1 $f6, ($t0)\n')
+        salida.write('\t\tadd.d $f4, $f4, $f6\n')
         salida.write('\t\tadd $t1, $t1, 1\n')
-        salida.write('\t\tadd $t0, $t0, 4\n')
+        salida.write('\t\tadd $t0, $t0, 8\n')
         salida.write('\t\tblt $t1, $t2, sumLoop\n')
-        salida.write('\tsw $t3, sum\n\n')
+        salida.write('\tswc1 $f4, sum\n\n')
 
-        salida.write('\tli $v0, 1\n')  #DESPLEGAR LA SUMA
-        salida.write('\tmove $a0, $t3\n')
-        salida.write('\tsyscall\n\n')  
+        salida.write('\t#li $v0, 3\n')  #DESPLEGAR LA SUMA
+        salida.write('\t#mov.d $f12, $f4\n')
+        salida.write('\t#syscall\n\n')  
 
-        salida.write('\tdiv $t5, $t3, $t2\n')   #CALCULAR PROMEDIO
-        salida.write('\tsw $t5, average\n\n')
+        salida.write('\tdiv.d $f6, $f4, $f2\n')   #CALCULAR PROMEDIO
+        salida.write('\tswc1 $f6, average\n\n')
         
-        salida.write('\tli $v0, 1\n')  #DESPLEGAR El PROMEDIO
-        salida.write('\tmove $a0, $t5\n')
+        salida.write('\tli $v0, 3\n')  #DESPLEGAR El PROMEDIO
+        salida.write('\tmov.d $f12, $f6\n')
         salida.write('\tsyscall\n\n')  
 
         salida.write('\tli $v0, 10\n\tsyscall')
