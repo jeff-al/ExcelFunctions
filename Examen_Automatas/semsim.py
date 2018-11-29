@@ -12,11 +12,16 @@ class semsim:
         self.estructura = estructura
         self.matriz = []
         self.valoresFinales = []
+        self.tipo = ''
 
     def run(self):
         print('Semsim : RUN')
         self.analizarTabla(self.estructura.tabla)
         self.analizarFuncion(self.estructura.funcion)
+        if(self.tipo.upper() == 'AVERAGE'):
+            self.crearAverage()
+        else:
+            self.crearVar()
         print('VALORES FINALES', self.valoresFinales)
 
     def analizarTabla(self, tabla):
@@ -25,6 +30,7 @@ class semsim:
             print(fila.valores)
 
     def analizarFuncion(self, funcion):
+        self.tipo = funcion.tipo
         for argumento in funcion.argumentos.listaArgumentos:
             if(isinstance(argumento, semantic.p_rango)):
                 self.analizarRango(argumento)
@@ -68,3 +74,48 @@ class semsim:
         else:
             valor = self.matriz[celda[0]][celda[1]]
             self.valoresFinales.append(valor)
+
+    def crearAverage(self):
+        print('Es average')
+        salida = open('output.s', 'w+')
+        salida.write('.data\n')              #DATOS A PARTIR DE AQUI
+        salida.write('\tarray:\t.word ')
+        
+        for item in range(len(self.valoresFinales)-1):
+            salida.write(str(self.valoresFinales[item]) + ', ')
+        salida.write(str(self.valoresFinales[-1])+'\n')
+        salida.write('\tlength:\t.word ' + str(len(self.valoresFinales)) + '\n')
+        salida.write('\tsum:\t.word 0\n')
+        salida.write('\taverage:\t.word 0\n')
+        
+        
+        
+        salida.write('.text\n')                 #TEXT A PARTIR DE AQUI
+        salida.write('\tmain:\n')
+        salida.write('\tla $t0, array\n\tli $t1, 0\n\tlw $t2, length\n\tli $t3, 0\n') #VARIABLES NECESARIAS
+       
+        salida.write('\tsumLoop:\n')            #CICLO PARA HACER EL CALCULO
+        salida.write('\t\tlw $t4, ($t0)\n')
+        salida.write('\t\tadd $t3, $t3, $t4\n')
+        salida.write('\t\tadd $t1, $t1, 1\n')
+        salida.write('\t\tadd $t0, $t0, 4\n')
+        salida.write('\t\tblt $t1, $t2, sumLoop\n')
+        salida.write('\tsw $t3, sum\n\n')
+
+        salida.write('\tli $v0, 1\n')  #DESPLEGAR LA SUMA
+        salida.write('\tmove $a0, $t3\n')
+        salida.write('\tsyscall\n\n')  
+
+        salida.write('\tdiv $t5, $t3, $t2\n')   #CALCULAR PROMEDIO
+        salida.write('\tsw $t5, average\n\n')
+        
+        salida.write('\tli $v0, 1\n')  #DESPLEGAR El PROMEDIO
+        salida.write('\tmove $a0, $t5\n')
+        salida.write('\tsyscall\n\n')  
+
+        salida.write('\tli $v0, 10\n\tsyscall')
+        salida.close() 
+
+    def crearVar(self):
+        print('Es var')
+        pass
