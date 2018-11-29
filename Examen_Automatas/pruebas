@@ -7,5 +7,5 @@ e d g 2 g
 ETABLE:
 
 IFUNCTION:
-=average(B3:B4, 2, 3, E3)
+=average(A0:E0, 2, 3, E3)
 EFUNCTION:
