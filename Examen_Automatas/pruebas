@@ -1,11 +1,11 @@
 ITABLE:
--1.13 3 4 5 6
-g h i j k
-2.0 5 90 f 12
-30 h 2 -1 2.2
-e d g 2 g 
+-1.13, 3, 4, 5, 6
+  g  , h, i, j, k
+ 2.0 , 5, 90, f, 12
+ 30  , h, 2, -1, 2.2
+  e  , d, g,  2, 2.3 
 ETABLE:
 
 IFUNCTION:
-=var(A0:E0, A2:C2, E2, A3, C3:E3, D4)
+=AVERAGE(A0:E0, A2:C2, E2, A3, C3:E3, D4, -1.5, 3.22, 25.77)
 EFUNCTION:

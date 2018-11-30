@@ -1,5 +1,4 @@
 #Programador: Jefferson Alvarez Lopez
-import semantic
 import sys
 
 

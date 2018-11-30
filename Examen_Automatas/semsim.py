@@ -1,8 +1,9 @@
 #Programador: Jefferson Alvarez Lopez
 #Como solo se va a hacer AVERAGE o Var entonces solo verfico que en recorrido no hayan letras
+#
 
 #MODULOS
-from semantic import *
+import syntacticStructure
 import sys
 
 
@@ -32,9 +33,9 @@ class semsim:
     def analizarFuncion(self, funcion):
         self.tipo = funcion.tipo
         for argumento in funcion.argumentos.listaArgumentos:
-            if(isinstance(argumento, semantic.p_rango)):
+            if(isinstance(argumento, syntacticStructure.p_rango)):
                 self.analizarRango(argumento)
-            elif (isinstance(argumento, semantic.p_celda)):
+            elif (isinstance(argumento, syntacticStructure.p_celda)):
                 self.analizarCelda(argumento)      
             else:
                 self.valoresFinales.append(argumento)
@@ -78,64 +79,26 @@ class semsim:
     def crearAverage(self):
         print('Es average')
         salida = open('output.s', 'w+')
-        salida.write('.data\n')              #DATOS A PARTIR DE AQUI
-        salida.write('\tarray:\t.double ')
+        salida.write('.data\n'+         #DATOS
+        '\tarray:\t.double ')
         
         for item in range(len(self.valoresFinales)-1):
             salida.write(str(self.valoresFinales[item]) + ', ')
-        salida.write(str(self.valoresFinales[-1])+'\n')
-        salida.write('\tlength:\t.double ' + str(len(self.valoresFinales)) + '\n')
-        salida.write('\tlength1:\t.word ' + str(len(self.valoresFinales)) + '\n')
-        salida.write('\tsum:\t.double 0\n')
-        salida.write('\taverage:\t.double 0\n')
+        salida.write(str(self.valoresFinales[-1])+'\n'+
+        '\tlength:\t.double ' + str(len(self.valoresFinales)) + '\n'+
+        '\tlength1:\t.word ' + str(len(self.valoresFinales)) + '\n'+
+        '\tsum:\t.double 0\n'+
+        '\taverage:\t.double 0\n')
         
         
         
-        salida.write('.text\n')                 #TEXT A PARTIR DE AQUI
-        salida.write('\tmain:\n')
-        salida.write('\tla $t0, array\n\tli $t1, 0\n\tldc1 $f2, length\n\tlw $t2, length1\n\tldc1 $f4, sum\n') #VARIABLES NECESARIAS
-       
-        salida.write('\tsumLoop:\n')            #CICLO PARA HACER EL CALCULO
-        salida.write('\t\tldc1 $f6, ($t0)\n')
-        salida.write('\t\tadd.d $f4, $f4, $f6\n')
-        salida.write('\t\tadd $t1, $t1, 1\n')
-        salida.write('\t\tadd $t0, $t0, 8\n')
-        salida.write('\t\tblt $t1, $t2, sumLoop\n')
-        salida.write('\tswc1 $f4, sum\n\n')
-
-        salida.write('\t#li $v0, 3\n')  #DESPLEGAR LA SUMA
-        salida.write('\t#mov.d $f12, $f4\n')
-        salida.write('\t#syscall\n\n')  
-
-        salida.write('\tdiv.d $f6, $f4, $f2\n')   #CALCULAR PROMEDIO
-        salida.write('\tswc1 $f6, average\n\n')
-        
-        salida.write('\tli $v0, 3\n')  #DESPLEGAR El PROMEDIO
-        salida.write('\tmov.d $f12, $f6\n')
-        salida.write('\tsyscall\n\n')  
-
-        salida.write('\tli $v0, 10\n\tsyscall')
-        salida.close() 
-
-    def crearVar(self):
-        salida = open('output.s', 'w+')
-        salida.write('.data\n')              #DATOS A PARTIR DE AQUI
-        salida.write('\tarray:\t.double ')
-        
-        for item in range(len(self.valoresFinales)-1):
-            salida.write(str(self.valoresFinales[item]) + ', ')
-        salida.write(str(self.valoresFinales[-1])+'\n')
-        salida.write('\tlength:\t.double ' + str(len(self.valoresFinales)) + '\n')
-        salida.write('\tlength1:\t.word ' + str(len(self.valoresFinales)) + '\n')
-        salida.write('\tsum:\t.double 0\n')
-        salida.write('\taverage:\t.double 0\n')
-        salida.write('\tvar:\t.double 0\n')
-        
-        
-        
-        salida.write('.text\n')                 #TEXT A PARTIR DE AQUI
-        salida.write('\tmain:\n')
-        salida.write('\tla $t0, array\n\tli $t1, 0\n\tldc1 $f2, length\n\tlw $t2, length1\n\tldc1 $f4, sum\n') #VARIABLES NECESARIAS
+        salida.write('.text\n'+      #VARIABLES NECESARIAS
+        '\tmain:\n'+
+        '\tla $t0, array\n'+
+        '\tli $t1, 0\n'+
+        '\tldc1 $f2, length\n'+
+        '\tlw $t2, length1\n'+
+        '\tldc1 $f4, sum\n')
        
         salida.write('\tsumLoop:\n'+            #CICLO PARA HACER EL CALCULO
         '\t\tldc1 $f6, ($t0)\n'+
@@ -143,23 +106,66 @@ class semsim:
         '\t\tadd $t1, $t1, 1\n'+
         '\t\tadd $t0, $t0, 8\n'+
         '\t\tblt $t1, $t2, sumLoop\n'+
-        '\tswc1 $f4, sum\n\n')
-
-        salida.write('\t#li $v0, 3\n')  #DESPLEGAR LA SUMA
-        salida.write('\t#mov.d $f12, $f4\n')
-        salida.write('\t#syscall\n\n')  
-
-        salida.write('\tdiv.d $f6, $f4, $f2\n'+
+        '\tswc1 $f4, sum\n\n'+
+        '\t#li $v0, 3\n'+
+        '\t#mov.d $f12, $f4\n'+
+        '\t#syscall\n\n'+
+        '\tdiv.d $f6, $f4, $f2\n'+
 	    '\tswc1 $f6, average\n'+
-        '\tmov.d $f8, $f6\n\n')
+        '\tli $v0, 3\n'+
+        '\tmov.d $f12, $f6\n'+
+        '\tsyscall\n\n')   
 
-        salida.write('\tli $v0, 3\n')  #DESPLEGAR El PROMEDIO
-        salida.write('\tmov.d $f12, $f8\n')
-        salida.write('\tsyscall\n\n')  
+        salida.close() 
 
-        salida.write('\tla $t0, array\n\tli $t1, 0\n\tldc1 $f2, length\n\tlw $t2, length1\n\tldc1 $f10, var\n') #VARIABLES NECESARIAS
+    def crearVar(self):
+        salida = open('output.s', 'w+')
+        salida.write('.data\n'+         #DATOS
+        '\tarray:\t.double ')
+        
+        for item in range(len(self.valoresFinales)-1):
+            salida.write(str(self.valoresFinales[item]) + ', ')
+        salida.write(str(self.valoresFinales[-1])+'\n'+
+        '\tlength:\t.double ' + str(len(self.valoresFinales)) + '\n'+
+        '\tlength1:\t.word ' + str(len(self.valoresFinales)) + '\n'+
+        '\tsum:\t.double 0\n'+
+        '\taverage:\t.double 0\n'+
+        '\tvar:\t.double 0\n')
+        
+        
+        
+        salida.write('.text\n'+      #VARIABLES NECESARIAS
+        '\tmain:\n'+
+        '\tla $t0, array\n'+
+        '\tli $t1, 0\n'+
+        '\tldc1 $f2, length\n'+
+        '\tlw $t2, length1\n'+
+        '\tldc1 $f4, sum\n')
+       
+        salida.write('\tsumLoop:\n'+            #CICLO PARA HACER EL CALCULO
+        '\t\tldc1 $f6, ($t0)\n'+
+        '\t\tadd.d $f4, $f4, $f6\n'+
+        '\t\tadd $t1, $t1, 1\n'+
+        '\t\tadd $t0, $t0, 8\n'+
+        '\t\tblt $t1, $t2, sumLoop\n'+
+        '\tswc1 $f4, sum\n\n'+
+        '\t#li $v0, 3\n'+
+        '\t#mov.d $f12, $f4\n'+
+        '\t#syscall\n\n'+
+        '\tdiv.d $f6, $f4, $f2\n'+
+	    '\tswc1 $f6, average\n'+
+        '\tmov.d $f8, $f6\n\n'+
+        '\t#li $v0, 3\n'+
+        '\t#mov.d $f12, $f8\n'+
+        '\t#syscall\n\n')  
 
-        salida.write('	devLoop:\n'+
+        salida.write('\tla $t0, array\n'+ #VARIABLES NECESARIAS
+        '\tli $t1, 0\n'+
+        '\tldc1 $f2, length\n'+
+        '\tlw $t2, length1\n'+
+        '\tldc1 $f10, var\n') 
+
+        salida.write('	devLoop:\n'+ #LOOP
 		'\t\tldc1 $f6, ($t0)\n'+
 		'\t\tsub.d $f4, $f6, $f8\n' +
 		'\t\tmul.d $f4, $f4, $f4\n' +
@@ -168,7 +174,7 @@ class semsim:
         '\t\tadd $t0, $t0, 8\n' +
 		'\t\tblt $t1, $t2, devLoop\n')
 
-        salida.write('\tswc1 $f10, sum\n\n'+
+        salida.write('\tswc1 $f10, sum\n\n'+ #FIN
 	    '\tdiv.d $f10, $f10, $f2\n'+
     	'\tswc1 $f10, average\n\n'+
 	    '\tli $v0, 3\n'+

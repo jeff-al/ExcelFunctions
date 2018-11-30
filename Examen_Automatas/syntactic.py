@@ -8,7 +8,7 @@
 import ply.yacc as yacc
 import argparse
 import sys
-import semantic
+import syntacticStructure
 import semsim
 #import cafesemsim2 #IDEA PARA MAS ADELANTE 
 
@@ -27,7 +27,7 @@ def p_excel_ejecutor(p):
     '''excel_ejecutor : tabla funcion'''
     global errorSintactico
     if(not errorSintactico):
-        estructuraPrincipal = semantic.p_excel_ejecutor(p[1],p[2])
+        estructuraPrincipal = syntacticStructure.p_excel_ejecutor(p[1],p[2])
         semsimP = semsim.semsim(estructuraPrincipal)
         semsimP.run()
         print('Sigue asi CRACK')
@@ -49,39 +49,42 @@ def p_tipo_entrada(p):
 
 def p_rango(p):
     ''' rango : CELDA DOS_PUNTOS CELDA'''
-    estructuraPrincipal = semantic.p_rango(p[1], p[3])
+    estructuraPrincipal = syntacticStructure.p_rango(p[1], p[3])
     p[0] = estructuraPrincipal
     #print('rango')
 
 def p_tipo_argumento(p):
     '''tipo_argumento : NUMERO_ENTERO
+    | NUMERO_REAL
     | rango
     | CELDA
      '''
     if(str(p[1]).isnumeric()):
         p[0] = int(p[1])
-    elif (isinstance(p[1], semantic.p_rango)):
+    elif (isinstance(p[1], syntacticStructure.p_rango)):
         p[0] = p[1]
+    elif (str(p[1]).__contains__(".")):
+        p[0] = float(p[1])
     else:
-        estructuraPrincipal = semantic.p_celda(p[1])
+        estructuraPrincipal = syntacticStructure.p_celda(p[1])
         p[0] = estructuraPrincipal
     #print('tipo_argumento')
 
 def p_tabla(p):
     '''tabla : PAL_ITABLE fila fila fila fila fila PAL_ETABLE '''
-    estructuraPrincipal = semantic.p_tabla(p[2], p[3], p[4], p[5], p[6])
+    estructuraPrincipal = syntacticStructure.p_tabla(p[2], p[3], p[4], p[5], p[6])
     p[0] = estructuraPrincipal
     #print('tabla')
 
 def p_fila(p):
-    '''fila : tipo_entrada tipo_entrada tipo_entrada tipo_entrada tipo_entrada'''
-    estructuraPrincipal = semantic.p_fila(p[1], p[2], p[3], p[4], p[5])
+    '''fila : tipo_entrada COMA tipo_entrada COMA tipo_entrada COMA tipo_entrada COMA tipo_entrada'''
+    estructuraPrincipal = syntacticStructure.p_fila(p[1], p[3], p[5], p[7], p[9])
     p[0] = estructuraPrincipal
     #print('fila')
 
 def p_funcion(p):
     '''funcion : PAL_IFUNCTION IGUAL tipo_func PARENTESIS_ABIERTO argumentos PARENTESIS_CERRADO PAL_EFUNCTION'''
-    estructuraPrincipal = semantic.p_funcion(p[3], p[5])
+    estructuraPrincipal = syntacticStructure.p_funcion(p[3], p[5])
     p[0] = estructuraPrincipal
     #print('funcion')
 
@@ -102,7 +105,7 @@ def p_extension_arg(p):
     | vacio
     '''
     if(p[1] == None):
-        p[0] = semantic.p_argumentos()
+        p[0] = syntacticStructure.p_argumentos()
     else:
         p[0] = p[2]
     #print('extension_arg')
