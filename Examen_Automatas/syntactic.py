@@ -1,6 +1,6 @@
 #Programador: Jefferson Alvarez
 #Suposiciones: Matrices de tamano fijo 5x5
-# 
+# - Vienen Saltos de linea despues de cada fila.
 
 #MODULOS
 
