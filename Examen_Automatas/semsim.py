@@ -1,6 +1,12 @@
 #Programador: Jefferson Alvarez Lopez
 #Como solo se va a hacer AVERAGE o Var entonces solo verfico que en recorrido no hayan letras
-#
+
+
+#ESTRUCTURA: 
+# 2 objetos: TABLA y FUNCION 
+# De la tabla recupero la matriz (sus filas) 
+# De la funcion recupero el tipo y los argumentos
+# Las funciones se genera en este archivo (Ya que el programa es pequeno no quise hacer una extra)
 
 #MODULOS
 import syntacticStructure
@@ -12,25 +18,25 @@ class semsim:
     def __init__(self, estructura):
         self.estructura = estructura
         self.matriz = []
-        self.valoresFinales = []
-        self.tipo = ''
+        self.valoresFinales = [] #Almacena los valores que van aser utilizados
+        self.tipo = '' #Almacena el tipo de funcion
 
     def run(self):
         print('Semsim : RUN')
         self.analizarTabla(self.estructura.tabla)
         self.analizarFuncion(self.estructura.funcion)
-        if(self.tipo.upper() == 'AVERAGE'):
+        if(self.tipo.upper() == 'AVERAGE'): #ES AVERAGE O VAR?
             self.crearAverage()
         else:
             self.crearVar()
         print('VALORES FINALES', self.valoresFinales)
 
-    def analizarTabla(self, tabla):
+    def analizarTabla(self, tabla): #SE pasa la matriz para hacer el analisis
         for fila in tabla.filas:
             self.matriz.append(fila.valores)
             print(fila.valores)
 
-    def analizarFuncion(self, funcion):
+    def analizarFuncion(self, funcion): #Se determina cuales son las entradas y se valida dependiendo de que sea cada una
         self.tipo = funcion.tipo
         for argumento in funcion.argumentos.listaArgumentos:
             if(isinstance(argumento, syntacticStructure.p_rango)):
@@ -40,7 +46,7 @@ class semsim:
             else:
                 self.valoresFinales.append(argumento)
 
-    def analizarRango(self, rango):
+    def analizarRango(self, rango): #De aqui se obtienen los indices a usar de la matriz
         celda1 = rango.celda1
         celda2 = rango.celda2
         if(celda1[0] > celda2[0]):
@@ -67,7 +73,7 @@ class semsim:
                     valor = self.matriz[itr][itr2]
                     self.valoresFinales.append(valor)
     
-    def analizarCelda(self, celdaEntrada):
+    def analizarCelda(self, celdaEntrada): #Se verifica que no sea un caracter
         celda = celdaEntrada.celda
         if(str(self.matriz[celda[0]][celda[1]]).isalpha()):
             print('ERROR:','LA FUNCION NO PUEDE MANEJAR CARACTERES ALFABETICOS')
@@ -76,7 +82,7 @@ class semsim:
             valor = self.matriz[celda[0]][celda[1]]
             self.valoresFinales.append(valor)
 
-    def crearAverage(self):
+    def crearAverage(self): #Se crea el codigo MIPS para el average
         print('Es average')
         salida = open('output.s', 'w+')
         salida.write('.data\n'+         #DATOS
@@ -88,7 +94,8 @@ class semsim:
         '\tlength:\t.double ' + str(len(self.valoresFinales)) + '\n'+
         '\tlength1:\t.word ' + str(len(self.valoresFinales)) + '\n'+
         '\tsum:\t.double 0\n'+
-        '\taverage:\t.double 0\n')
+        '\taverage:\t.double 0\n'+
+        '\tfuncion: .asciiz "Average: "\n\n')
         
         
         
@@ -110,6 +117,9 @@ class semsim:
         '\t#li $v0, 3\n'+
         '\t#mov.d $f12, $f4\n'+
         '\t#syscall\n\n'+
+        '\tli $v0, 4\n'+
+	    '\tla $a0, funcion\n'+
+	    '\tsyscall\n\n'+
         '\tdiv.d $f6, $f4, $f2\n'+
 	    '\tswc1 $f6, average\n'+
         '\tli $v0, 3\n'+
@@ -118,7 +128,12 @@ class semsim:
 
         salida.close() 
 
-    def crearVar(self):
+    def crearVar(self):         #Se crea el codigo MIPS para VAR
+        print('Es var')
+        if(len(self.valoresFinales) == 1):
+            print('La funcion VAR necesita, al menos, 2 valores')
+            sys.exit(-1)
+
         salida = open('output.s', 'w+')
         salida.write('.data\n'+         #DATOS
         '\tarray:\t.double ')
@@ -128,9 +143,11 @@ class semsim:
         salida.write(str(self.valoresFinales[-1])+'\n'+
         '\tlength:\t.double ' + str(len(self.valoresFinales)) + '\n'+
         '\tlength1:\t.word ' + str(len(self.valoresFinales)) + '\n'+
+        '\tlength2:\t.double ' + str(len(self.valoresFinales)-1) + '\n'+
         '\tsum:\t.double 0\n'+
         '\taverage:\t.double 0\n'+
-        '\tvar:\t.double 0\n')
+        '\tvar:\t.double 0\n'+
+        '\tfuncion: .asciiz "Var: "\n\n')
         
         
         
@@ -161,7 +178,7 @@ class semsim:
 
         salida.write('\tla $t0, array\n'+ #VARIABLES NECESARIAS
         '\tli $t1, 0\n'+
-        '\tldc1 $f2, length\n'+
+        '\tldc1 $f2, length2\n'+
         '\tlw $t2, length1\n'+
         '\tldc1 $f10, var\n') 
 
@@ -177,6 +194,9 @@ class semsim:
         salida.write('\tswc1 $f10, sum\n\n'+ #FIN
 	    '\tdiv.d $f10, $f10, $f2\n'+
     	'\tswc1 $f10, average\n\n'+
+        '\tli $v0, 4\n'+
+	    '\tla $a0, funcion\n'+
+	    '\tsyscall\n\n'+
 	    '\tli $v0, 3\n'+
 	    '\tmov.d $f12, $f10\n'+
 	    '\tsyscall\n\n'+

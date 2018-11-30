@@ -1,4 +1,7 @@
 #Programador: Jefferson Alvarez Lopez
+#Nota: Se que el "Determinar indice" se puede usar una sola vez pero
+#quiero que se vea como a parte cada uno. (En rango y Celda)
+
 import sys
 
 

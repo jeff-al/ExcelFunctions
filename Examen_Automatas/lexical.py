@@ -1,6 +1,7 @@
 #Programador: Jefferson Alvarez Lopez
-#Suposiciones: Las funciones vienen o solo mayusculas o solo minusculas
-#
+#Suposiciones: 
+# - Las funciones vienen solo mayusculas o solo minusculas
+# - Las filas empiezan en 0 y no en 1. 
 #
 
 #MODULOS
@@ -68,56 +69,4 @@ def t_newline(t):
 
 t_ignore = ' \t'
     
-
-
-
-
-#############################PRUEBAS#####################################################
-
-'''def main(argv):
-    inputfile = ''
-    outputfile = ''
-    try:
-        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
-    except getopt.GetoptError:
-        printHelp()
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '--help':
-            printHelp()
-            sys.exit()
-        elif opt == "-i":
-            inputfile = arg
-    #print 'Input file is "%s"' %inputfile
-
-    # Se debe abrir el archivo pasado por consola
-    
-    # Primero se verifica que el ususario haya pasado un archivo de entrada.
-    # Si no es el caso se imprime un mensaje de error en consola.
-    if not inputfile:
-        print('ERROR')
-        return
-    
-    # Si el usuario paso un archivo de entrada
-    # Se intenta habrir el archivo
-    # Si el archivo no se pudo habrir se imprime un mensaje de error en consola.
-    iF = open(inputfile, 'r')
-    if(iF.mode != 'r'):
-        print('ERROR')
-        return
-
-    # Si el archivo es valido
-    # Uso de lex
-    lexer = lex.lex()
-
-    data = iF.read()
-    #print(data)
-
-    lexer.input(data)
-    for tok in lexer:
-        print('Token: ' + str(tok.value) + '\n' + 'Tipo: ' + str(tok.type) + '\n')    
-
-if __name__ == "__main__":
-   main(sys.argv[1:])
-'''
 lexer = lex.lex()

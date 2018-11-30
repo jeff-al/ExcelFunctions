@@ -1,7 +1,6 @@
 #Programador: Jefferson Alvarez
 #Suposiciones: Matrices de tamano fijo 5x5
-#
-#
+# 
 
 #MODULOS
 
@@ -10,7 +9,6 @@ import argparse
 import sys
 import syntacticStructure
 import semsim
-#import cafesemsim2 #IDEA PARA MAS ADELANTE 
 
 
 #TOKENS DEL ANALIZADOR LEXICO
@@ -30,9 +28,7 @@ def p_excel_ejecutor(p):
         estructuraPrincipal = syntacticStructure.p_excel_ejecutor(p[1],p[2])
         semsimP = semsim.semsim(estructuraPrincipal)
         semsimP.run()
-        print('Sigue asi CRACK')
-
-    #FALTA AGREGAR EL LLAMADO A LA EJECUCION DE LA ESTRUCTURA
+        #print('Sigue asi CRACK')
 
 def p_tipo_entrada(p):
     '''tipo_entrada : CARACTER
@@ -59,12 +55,13 @@ def p_tipo_argumento(p):
     | rango
     | CELDA
      '''
-    if(str(p[1]).isnumeric()):
-        p[0] = int(p[1])
-    elif (isinstance(p[1], syntacticStructure.p_rango)):
+    
+    if (isinstance(p[1], syntacticStructure.p_rango)):
         p[0] = p[1]
     elif (str(p[1]).__contains__(".")):
         p[0] = float(p[1])
+    elif(str(p[1]).isnumeric() or str(p[1]).__contains__("-")):
+        p[0] = int(p[1])
     else:
         estructuraPrincipal = syntacticStructure.p_celda(p[1])
         p[0] = estructuraPrincipal
@@ -114,10 +111,12 @@ def p_vacio(p):
     '''vacio : '''
     p[0] = None
     #print('VACIO')
-###########################################PRUEBAS######################################
 
 
-# Regla para el error
+###########################################REUTILIZO######################################
+
+
+# Regla para el error (Reutilizado del proyecto)
 def p_error(p):
     global errorSintactico
     errorSintactico = True
@@ -149,5 +148,4 @@ data = iF.read()
 
 # Construyo el parser
 yaccer = yacc.yacc()
-
 yaccer.parse(data)
